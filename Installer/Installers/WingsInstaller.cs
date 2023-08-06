@@ -49,6 +49,8 @@ public class WingsInstaller
 
         if (architectureType == "x86_64")
             architectureType = "amd64";
+        else
+            architectureType = "arm64";
 
         AnsiConsole.MarkupLine($"[white]Selecting architecture {architectureType}[/]");
 
