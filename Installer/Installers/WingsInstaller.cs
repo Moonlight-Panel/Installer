@@ -61,7 +61,7 @@ public class WingsInstaller
 
             var response = await httpClient
                 .GetAsync(
-                    $"https://github.com/pterodactyl/wings/releases/latest/download/wings_linux__{architectureType}");
+                    $"https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_{architectureType}");
 
             await response.Content.CopyToAsync(fs);
 
