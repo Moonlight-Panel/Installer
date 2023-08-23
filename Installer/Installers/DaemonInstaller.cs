@@ -53,7 +53,7 @@ public static class DaemonInstaller
 
             var response = await httpClient
                 .GetAsync(
-                    $"https://github.com/Moonlight-Panel/MoonlightDaemon/releases/download/v1b16/MoonlightDaemon_{architectureType}");
+                    $"https://github.com/Moonlight-Panel/MoonlightDaemon/releases/download/v1b17/MoonlightDaemon_{architectureType}");
 
             await response.Content.CopyToAsync(fs);
 
