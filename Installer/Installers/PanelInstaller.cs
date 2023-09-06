@@ -106,10 +106,18 @@ public static class PanelInstaller
                 using var httpClient = new HttpClient();
                 defaultIp = await httpClient.GetStringAsync("https://api.ipify.org");
             }
-            catch (Exception) {}
+            catch (Exception) { /* ignored */ }
 
             AnsiConsole.WriteLine();
-            basicConfig.Moonlight.AppUrl = AnsiConsole.Ask<string>("[white]Enter the app url for moonlight[/]", $"http://{defaultIp}");
+            
+            do
+            {
+                basicConfig.Moonlight.AppUrl = AnsiConsole.Ask<string>("[white]Enter the app url for moonlight (with http or https)[/]", $"http://{defaultIp}");
+            } 
+            while (
+                string.IsNullOrEmpty(basicConfig.Moonlight.AppUrl) ||
+                   !basicConfig.Moonlight.AppUrl.StartsWith("http")
+            );
 
             AnsiConsole.MarkupLine("[white]Saving config file...[/]");
             
