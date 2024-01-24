@@ -28,19 +28,8 @@ public static class BashHelper
         return output;
     }
     
-    public static async Task<int> ExecuteCommandForExitCode(string command)
-    {
-        Process process = new Process();
-        
-        process.StartInfo.FileName = "/bin/bash";
-        process.StartInfo.Arguments = $"-c \"{command.Replace("\"", "\\\"")}\"";
-        process.StartInfo.UseShellExecute = false;
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.RedirectStandardError = true;
-
-        process.Start();
-
-        string output = await process.StandardOutput.ReadToEndAsync();
+    public static async Task<int> ExecuteCommandForExitCode(string command) {
+        var process = await ExecuteCommandRaw(command);
         await process.WaitForExitAsync();
 
         return process.ExitCode;
