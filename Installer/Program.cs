@@ -23,7 +23,25 @@ AnsiConsole.MarkupLine($"[white]Starting installer for: {installer}[/]");
 
 switch (installer) {
     case "Moonlight Panel":
-        await PanelInstaller.Install();
+        var installerStatus = PanelInstallationState.Successful;
+        try {
+            installerStatus = await PanelInstaller.Install();
+        }
+        finally {
+            switch (installerStatus) {
+                case PanelInstallationState.DockerNotInstalled:
+                    AnsiConsole.MarkupLine(
+                        "[red]Installation Failed: Docker is [red]required[/] to use Moonlight, you may install it manually, or let the installer do its magic.");
+                    break;
+                case PanelInstallationState.FailedToInstallDocker:
+                    AnsiConsole.MarkupLine(
+                        "[red]Installation Failed: Docker is [red]required[/] to use Moonlight. We have made an attempt to install it but it has failed, please attempt to install it yourself manually and then re-run the installer.");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
         break;
     case "Moonlight Daemon":
         await DaemonInstaller.Install();
