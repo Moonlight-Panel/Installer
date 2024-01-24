@@ -6,7 +6,8 @@ Console.OutputEncoding = Encoding.UTF8;
 Console.InputEncoding = Encoding.UTF8;
 
 AnsiConsole.MarkupLine("[aqua]Moonlight Panel Installer[/]");
-AnsiConsole.MarkupLine("[white]Welcome to the moonlight panel installer. This program will guide you through the installation of the moonlight panel, the daemon and wings[/]");
+AnsiConsole.MarkupLine(
+    "[white]Welcome to the moonlight panel installer. This program will guide you through the installation of the moonlight panel, the daemon and wings[/]");
 
 var installer = AnsiConsole.Prompt(
     new SelectionPrompt<string>()
@@ -16,12 +17,11 @@ var installer = AnsiConsole.Prompt(
             "Moonlight Daemon",
             "Wings"
         )
-    );
+);
 
 AnsiConsole.MarkupLine($"[white]Starting installer for: {installer}[/]");
 
-switch (installer)
-{
+switch (installer) {
     case "Moonlight Panel":
         await PanelInstaller.Install();
         break;
@@ -32,3 +32,5 @@ switch (installer)
         await WingsInstaller.Install();
         break;
 }
+
+AnsiConsole.MarkupLine($"[white]{installer} has been installed![/]");
