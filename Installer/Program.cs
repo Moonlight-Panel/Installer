@@ -1,34 +1,64 @@
-﻿using System.Text;
-using Installer.Installers;
-using Spectre.Console;
+using Installer.App.Extensions;
+using Installer.App.Helpers.LogMigrator;
+using Installer.App.Services.Interop;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Serilog;
 
-Console.OutputEncoding = Encoding.UTF8;
-Console.InputEncoding = Encoding.UTF8;
+var builder = WebApplication.CreateBuilder(args);
 
-AnsiConsole.MarkupLine("[aqua]Moonlight Panel Installer[/]");
-AnsiConsole.MarkupLine("[white]Welcome to the moonlight panel installer. This program will guide you through the installation of the moonlight panel, the daemon and wings[/]");
+// Setup logger
+var logConfig = new LoggerConfiguration();
 
-var installer = AnsiConsole.Prompt(
-    new SelectionPrompt<string>()
-        .Title("[white]Please select the software you want to install on this machine[/]")
-        .AddChoices(
-            "Moonlight Panel",
-            "Moonlight Daemon",
-            "Wings"
-        )
-    );
+logConfig = logConfig.Enrich.FromLogContext()
+    .WriteTo.Console(
+        outputTemplate:
+        "{Timestamp:HH:mm:ss} [{Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}");
 
-AnsiConsole.MarkupLine($"[white]Starting installer for: {installer}[/]");
+if (args.Contains("--debug") || builder.Environment.IsDevelopment())
+    logConfig = logConfig.MinimumLevel.Debug();
+else
+    logConfig = logConfig.MinimumLevel.Information();
 
-switch (installer)
+Log.Logger = logConfig.CreateLogger();
+
+// Add services
+
+builder.Services.AddScoped<AlertService>();
+builder.Services.AddScoped<ClipboardService>();
+builder.Services.AddScoped<CookieService>();
+builder.Services.AddScoped<FileDownloadService>();
+builder.Services.AddScoped<ModalService>();
+builder.Services.AddScoped<ToastService>();
+
+//
+
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddProvider(new LogMigrateProvider());
+
+var config =
+    new ConfigurationBuilder().AddJsonString(
+        "{\"LogLevel\":{\"Default\":\"Information\",\"Microsoft.AspNetCore\":\"Warning\"}}");
+builder.Logging.AddConfiguration(config.Build());
+
+var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
 {
-    case "Moonlight Panel":
-        await PanelInstaller.Install();
-        break;
-    case "Moonlight Daemon":
-        await DaemonInstaller.Install();
-        break;
-    case "Wings":
-        await WingsInstaller.Install();
-        break;
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
 }
+
+app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.MapBlazorHub();
+app.MapFallbackToPage("/_Host");
+
+app.Run();

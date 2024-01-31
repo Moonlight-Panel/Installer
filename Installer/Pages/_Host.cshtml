@@ -1,0 +1,31 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@namespace Installer.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8"/>
+    <base href="~/"/>
+    
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered"/>
+    <title>Moonlight Web Installer</title>
+    
+    <link href="https://install.moonlightpanel.xyz/web/css/theme.min.css" type="text/css" rel="stylesheet"/>
+    <link href="https://install.moonlightpanel.xyz/web/css/utils.css" type="text/css" rel="stylesheet"/>
+    <link href="https://install.moonlightpanel.xyz/web/css/boxicons.css" type="text/css" rel="stylesheet"/>
+    <link href="https://install.moonlightpanel.xyz/web/css/sweeatalert2.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+
+<component type="typeof(BlazorApp)" render-mode="ServerPrerendered"/>
+
+<script src="https://install.moonlightpanel.xyz/web/js/bootstrap.bundle.min.js"></script>
+<script src="https://install.moonlightpanel.xyz/web/js/toaster.js"></script>
+<script src="https://install.moonlightpanel.xyz/web/js/sweeatalert2.js"></script>
+<script src="https://install.moonlightpanel.xyz/web/js/mwi.js"></script>
+
+<script src="_framework/blazor.server.js"></script>
+</body>
+</html>
