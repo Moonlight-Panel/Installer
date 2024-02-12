@@ -10,8 +10,15 @@ public class InstallationService
     public readonly List<Software> Softwares = new();
     public readonly List<SoftwareDependency> SoftwareDependencies = new();
 
-    public InstallationState? InstallationState { get; private set; }
-    public bool IsInstalling { get; set; } = false;
+    public InstallationState InstallationState { get; private set; } = new();
+    public SoftwareDependency? CurrentInstallingDependency { get; private set; }
+
+    private readonly IServiceProvider ServiceProvider;
+
+    public InstallationService(IServiceProvider serviceProvider)
+    {
+        ServiceProvider = serviceProvider;
+    }
 
     public Task<SoftwareDependency[]> ResolveDependencies(Software software)
     {
@@ -20,6 +27,28 @@ public class InstallationService
             .ToArray();
 
         return Task.FromResult(result);
+    }
+
+    public async Task Install(Software software)
+    {
+        using var scope = ServiceProvider.CreateScope();
+        var provider = scope.ServiceProvider;
+        
+        var dependencies = await ResolveDependencies(software);
+        
+        foreach (var dependency in dependencies)
+        {
+            if (!await dependency.IsFulfilled(provider))
+            {
+                CurrentInstallingDependency = dependency;
+                
+                await dependency.Install(provider, InstallationState);
+
+                CurrentInstallingDependency = null;
+            }
+        }
+
+        await software.Install(provider, InstallationState);
     }
 
     public Task AddSoftware<T>() where T : Software

@@ -5,107 +5,153 @@
 
 @inject InstallationService InstallationService
 
-@if (InstallationService.IsInstalling)
+@if (SelectedSoftware == null)
 {
-}
-else
-{
-    if (SelectedSoftware == null)
-    {
-        <div class="card card-body text-center p-5">
-            <div class="fw-semibold fs-2">Welcome to the moonlight panel web installer</div>
-            <div class="fw-semibold fs-4">Select a software to install on this machine</div>
-        </div>
+    <div class="card card-body text-center p-5">
+        <div class="fw-semibold fs-2">Welcome to the moonlight panel web installer</div>
+        <div class="fw-semibold fs-4">Select a software to install on this machine</div>
+    </div>
 
-        <div class="row g-3 mt-5">
-            @foreach (var software in InstallationService.Softwares)
-            {
-                <div class="col-md-4 col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="card-title">
-                                <button class="btn btn-icon btn-secondary disabled me-3" disabled="disabled">
-                                    <i class="@(software.Icon)"></i>
-                                </button>
-                                @software.Name
-                            </span>
-                        </div>
-                        <div class="card-body fs-5">
-                            @(software.Description)
-                        </div>
-                        <div class="card-footer d-flex justify-content-center">
-                            <WButton OnClick="() => SelectSoftware(software)" CssClasses="btn btn-primary">
-                                Continue
-                                <i class="bx bx-sm bx-right-arrow-alt"></i>
-                            </WButton>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    }
-    else
-    {
-        if (IsSoftwareConfigured)
+    <div class="row g-3 mt-5">
+        @foreach (var software in InstallationService.Softwares)
         {
-            if (ConfigureDependencyIndex >= SoftwareDependencies.Length)
-            {
-                <div class="card card-body text-center p-5">
-                    <div class="fw-semibold fs-2">Configuration complete</div>
-                    <div class="fw-semibold fs-4">You have configured everything. You are now able to perform the installation</div>
-                </div>
-
-                <div class="card mt-5">
-                    <div class="card-body fs-5">
-                        <div class="alert alert-warning">
-                            Please keep in mind that the installation will modify the machine its running on.
-                            We do not take any responsibilities if this leads to permanent or temporary damage.
-                        </div>
+            <div class="col-md-4 col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">
+                            <button class="btn btn-icon btn-secondary disabled me-3" disabled="disabled">
+                                <i class="@(software.Icon)"></i>
+                            </button>
+                            @software.Name
+                        </span>
                     </div>
-                    <div class="card-footer text-center">
-                        <WButton OnClick="BeginInstall" CssClasses="btn btn-primary">
+                    <div class="card-body fs-5">
+                        @(software.Description)
+                    </div>
+                    <div class="card-footer d-flex justify-content-center">
+                        <WButton OnClick="() => SelectSoftware(software)" CssClasses="btn btn-primary">
                             Continue
                             <i class="bx bx-sm bx-right-arrow-alt"></i>
                         </WButton>
                     </div>
                 </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    if (IsSoftwareConfigured)
+    {
+        if (ConfigureDependencyIndex >= SoftwareDependencies.Length)
+        {
+            var installState = InstallationService.InstallationState;
+
+            if (ShowInstalling)
+            {
+                <div class="card card-body text-center p-5">
+                    <div class="fw-semibold fs-2">Installation in progress...</div>
+                    <div class="fw-semibold fs-4">Do NOT leave the site and be patient during the installation</div>
+                </div>
             }
             else
             {
-                var dependency = SoftwareDependencies[ConfigureDependencyIndex];
-                
                 <div class="card card-body text-center p-5">
-                    <div class="fw-semibold fs-2">Configuring dependency: <span class="text-primary">@(dependency.Name)</span></div>
-                    <div class="fw-semibold fs-4">@(SoftwareDependencies.Length - ConfigureDependencyIndex - 1) left</div>
+                    <div class="fw-semibold fs-2">Ready to install!</div>
+                    <div class="fw-semibold fs-4">You have configured everything. You are now able to perform the installation</div>
                 </div>
-                
-                <div class="card mt-5">
-                    <SmartForm Model="dependency.Config" OnValidSubmit="NextDependencyConfiguration">
-                        <div class="card-body row">
-                            <DynamicTypedAutoForm Model="dependency.Config" Columns="6"></DynamicTypedAutoForm>
-                        </div>
-                        <div class="card-footer text-center">
-                            <button type="submit" class="btn btn-primary">
-                                Continue
-                                <i class="bx bx-sm bx-right-arrow-alt"></i>
-                            </button>
-                        </div>
-                    </SmartForm>
+            }
 
+            <div class="card mt-5">
+                <div class="card-body fs-5">
+                    @if (ShowInstalling)
+                    {
+                        if (InstallationService.CurrentInstallingDependency == null && installState.MaxSteps != 0)
+                        {
+                            var percent = Math.Round(100f * ((float)installState.CurrentStep / installState.MaxSteps));
+
+                            <div class="progress" style="height: 40px;">
+                                <div class="progress-bar bg-primary fs-5 fw-semibold" role="progressbar" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" style="width: @(percent)%">
+                                    @installState.Text
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="progress" style="height: 40px;">
+                                <div class="progress-bar bg-secondary progress-bar-striped progress-bar-animated fs-5 fw-semibold" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                                    Waiting...
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            Please keep in mind that the installation will modify the machine its running on.
+                            We do not take any responsibilities if this leads to permanent or temporary damage.
+                        </div>
+                    }
+                </div>
+                <div class="card-footer text-center">
+                    <WButton OnClick="Install" CssClasses="btn btn-primary">
+                        Install
+                        <i class="bx bx-sm bx-right-arrow-alt"></i>
+                    </WButton>
+                </div>
+            </div>
+
+            if (ShowInstalling)
+            {
+                <div class="mt-5 row g-3">
+                    @foreach (var dependency in SoftwareDependencies)
+                    {
+                        <div class="col-md-4 col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <span class="card-title">
+                                        @dependency.Name
+                                    </span>
+                                </div>
+                                <div class="card-body">
+                                    @if (InstallationService.CurrentInstallingDependency == dependency && installState.MaxSteps != 0)
+                                    {
+                                        var percent = Math.Round(100f * ((float)installState.CurrentStep / installState.MaxSteps));
+
+                                        <div class="progress" style="height: 40px;">
+                                            <div class="progress-bar bg-primary fs-5 fw-semibold" role="progressbar" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100" style="width: @(percent)%">
+                                                @installState.Text
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="progress" style="height: 40px;">
+                                            <div class="progress-bar bg-secondary progress-bar-striped progress-bar-animated fs-5 fw-semibold" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                                                Waiting...
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
             }
         }
         else
         {
+            var dependency = SoftwareDependencies[ConfigureDependencyIndex];
+
             <div class="card card-body text-center p-5">
-                <div class="fw-semibold fs-2">Configuring: <span class="text-primary">@(SelectedSoftware.Name)</span></div>
-                <div class="fw-semibold fs-4">Edit the options below to fit your needs</div>
+                <div class="fw-semibold fs-2">Configuring dependency: <span class="text-primary">@(dependency.Name)</span></div>
+                <div class="fw-semibold fs-4">@(SoftwareDependencies.Length - ConfigureDependencyIndex - 1) left</div>
             </div>
 
             <div class="card mt-5">
-                <SmartForm Model="SelectedSoftware.Config" OnValidSubmit="FinishSoftwareConfigure">
+                <SmartForm Model="dependency.Config" OnValidSubmit="NextDependencyConfiguration">
                     <div class="card-body row">
-                        <DynamicTypedAutoForm Model="SelectedSoftware.Config" Columns="6"></DynamicTypedAutoForm>
+                        <DynamicTypedAutoForm Model="dependency.Config" Columns="6"></DynamicTypedAutoForm>
                     </div>
                     <div class="card-footer text-center">
                         <button type="submit" class="btn btn-primary">
@@ -118,6 +164,28 @@ else
             </div>
         }
     }
+    else
+    {
+        <div class="card card-body text-center p-5">
+            <div class="fw-semibold fs-2">Configuring: <span class="text-primary">@(SelectedSoftware.Name)</span></div>
+            <div class="fw-semibold fs-4">Edit the options below to fit your needs</div>
+        </div>
+
+        <div class="card mt-5">
+            <SmartForm Model="SelectedSoftware.Config" OnValidSubmit="FinishSoftwareConfigure">
+                <div class="card-body row">
+                    <DynamicTypedAutoForm Model="SelectedSoftware.Config" Columns="6"></DynamicTypedAutoForm>
+                </div>
+                <div class="card-footer text-center">
+                    <button type="submit" class="btn btn-primary">
+                        Continue
+                        <i class="bx bx-sm bx-right-arrow-alt"></i>
+                    </button>
+                </div>
+            </SmartForm>
+
+        </div>
+    }
 }
 
 @code
@@ -127,6 +195,8 @@ else
 
     private SoftwareDependency[] SoftwareDependencies;
     private int ConfigureDependencyIndex = 0;
+
+    private bool ShowInstalling = false;
 
     private async Task SelectSoftware(Software software)
     {
@@ -149,8 +219,13 @@ else
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task BeginInstall()
+    private async Task Install()
     {
-        
+        InstallationService.InstallationState.OnUpdated += async () => { await InvokeAsync(StateHasChanged); };
+
+        ShowInstalling = true;
+        await InvokeAsync(StateHasChanged);
+
+        await InstallationService.Install(SelectedSoftware!);
     }
 }

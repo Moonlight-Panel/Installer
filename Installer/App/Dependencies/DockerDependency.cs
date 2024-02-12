@@ -20,22 +20,38 @@ public class DockerDependency : SoftwareDependency
         // Load dependencies
         var bashService = provider.GetRequiredService<BashService>();
         
-        // Step 1, ensuring curl and bash have been installed
-        await state.Update(1, "Checking if curl and bash are installed");
-        await bashService.ExecuteCommand("apt install curl bash -y");
+        /*
+         *
+         * // Step 1, ensuring curl and bash have been installed
+           await state.Update(1, "Checking if curl and bash are installed");
+           await bashService.ExecuteCommand("apt install curl bash -y");
+         */
         
-        // Step 2, running the install script for docker
-        await state.Update(2, "Installing docker using the install script");
-        await bashService.ExecuteCommand("curl -sSL https://get.docker.com/ | CHANNEL=stable bash");
+       /*
+        * // Step 2, running the install script for docker
+                 await state.Update(2, "Installing docker using the install script");
+                 await bashService.ExecuteCommand("curl -sSL https://get.docker.com/ | CHANNEL=stable bash");
+        * 
+        */
+
+       await state.Update(2, "Installing docker using the install script");
+       await Task.Delay(5000);
         
-        // Step 3, checking if installation was successful
-        if (!await IsFulfilled(provider))
-            throw new DisplayException(
-                "The install script ran but docker is still missing. Please check if your operating system is supported");
+       /*
+        *
+        * // Step 3, checking if installation was successful
+          if (!await IsFulfilled(provider))
+              throw new DisplayException(
+                  "The install script ran but docker is still missing. Please check if your operating system is supported");
+        */
+
+       await state.Update(3, "Verifying installation");
     }
 
     public override async Task<bool> IsFulfilled(IServiceProvider provider)
     {
+        return false;
+        
         var bashService = provider.GetRequiredService<BashService>();
 
         var whichDockerResult = await bashService.ExecuteCommand("which docker");

@@ -1,6 +1,7 @@
 ﻿using Installer.App.Dependencies;
 using Installer.App.Models.Abstractions;
 using Installer.App.Models.Configs;
+using MoonCore.Helpers;
 
 namespace Installer.App.Softwares;
 
@@ -19,8 +20,15 @@ public class MoonlightLegacySoftware : Software
         AddDependency<DockerDependency>();
     }
 
-    public override Task Install(IServiceProvider provider, InstallationState state)
+    public override async Task Install(IServiceProvider provider, InstallationState state)
     {
-        throw new NotImplementedException();
+        state.MaxSteps = 100;
+        await state.Update();
+
+        for (int i = 0; i < 101; i++)
+        {
+            await Task.Delay(500);
+            await state.Update(i, Formatter.GenerateString(16));
+        }
     }
 }
