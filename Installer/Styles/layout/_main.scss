@@ -1,0 +1,81 @@
+//
+// Main
+//
+
+
+// Body
+body {
+	background-color: var(--#{$prefix}page-bg);
+}
+
+// Font color from Content background color
+.text-page-bg {
+	color: $page-bg;
+}
+
+.app-blank {
+	background-color: var(--#{$prefix}app-blank-bg) !important;
+}
+
+// Header background
+.header-bg {	
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-image: url('../media/misc/header-bg.png');
+}
+
+// Page background
+.page-bg {	
+	background-size: cover;
+	background-attachment: fixed;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-image: url('../media/misc/page-bg.jpg');
+}
+
+@if $enable-rounded {
+	// Fullscreen modals
+	.modal-fullscreen .modal-content {
+		border-radius: 24px;
+
+		.modal-header {
+			border-top-left-radius: 23px;
+			border-top-right-radius: 23px;
+		}
+	}
+}
+
+
+// Desktop Mode
+@include media-breakpoint-up(lg) {
+	// Containers
+	.container,
+	.container-fluid {
+		padding: 0 get($content-spacing, desktop);
+	}
+
+	// Wrapper
+	.wrapper {
+		transition: padding-left get($aside-config, transition-speed) ease;
+		padding-top: get($header-config, height, desktop);
+		padding-left: get($aside-config, width) + get($content-spacing, desktop);
+	}
+}
+
+// Tablet & mobile modes
+@include media-breakpoint-down(lg) {
+	// Containers
+	.container,
+	.container-fluid {
+		max-width: none;
+		padding: 0 get($content-spacing, tablet-and-mobile);
+	}
+
+	// Wrapper
+	.wrapper {
+		// Fixed header mode
+		.header-tablet-and-mobile-fixed & {
+			padding-top: get($header-config, height, tablet-and-mobile);
+		}
+	}
+}

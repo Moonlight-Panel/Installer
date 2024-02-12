@@ -1,0 +1,60 @@
+//
+// Header
+//
+
+// General
+.header {
+	display: flex;
+	align-items: stretch;
+
+	.header-brand {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.container-fluid,
+	.container,
+	.container-xxl {
+		display: flex;
+		justify-content: space-between;
+		align-items: stretch;
+	}
+
+	.header-search {
+		i {
+			color: rgba($white, 0.65);
+		}
+	}
+}
+
+// Desktop mode
+@include media-breakpoint-up(lg) {
+	// General
+	.header {		
+		position: fixed;
+		height: get($header-config, height, desktop);
+		z-index: get($header-config, z-index);
+		background-color: var(--#{$prefix}header-bg-color);
+		top: 0;
+		right: 0;
+		left: 0;
+	}
+}
+
+// Tablet & mobile modes
+@include media-breakpoint-down(lg) {
+	.header {
+		height: get($header-config, height, tablet-and-mobile);
+
+		// Fixed header and header sticky modes
+		.header-tablet-and-mobile-fixed & {
+			position: fixed;
+			height: get($header-config, height, tablet-and-mobile);
+			z-index: get($header-config, z-index);
+			top: 0;
+			right: 0;
+			left: 0;			
+		}	
+	}
+}

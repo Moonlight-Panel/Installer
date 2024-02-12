@@ -1,0 +1,59 @@
+//
+// Topbar
+//
+
+
+// Desktop mode
+@include media-breakpoint-up(lg) {
+    // Base
+    .topbar {
+        // Search
+        .header-search {
+            form {
+                .form-control {
+                    @include placeholder(rgba($white, 0.75));		
+                    @include border-radius($input-border-radius);	
+                    background-color: rgba($white, 0.10) !important;
+                    border: 1px solid rgba($white, 0.10) !important;
+                    color: $white !important;					
+                }
+
+                .svg-icon {
+                    color: $white;
+                }
+
+                .spinner-border {
+                    color: rgba($white, 0.75) !important;
+                }
+            }			
+        }
+    }
+}
+
+// Tablet & mobile modes
+@include media-breakpoint-down(lg) {
+    $btn-size: 33px;
+
+    // Base
+    .topbar {
+        .btn {
+            height: $btn-size;
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-icon {
+            width: $btn-size;
+            height: $btn-size;
+        }
+
+        // Search
+        .header-search {
+            form {
+                .form-control {
+                    height: $btn-size;
+                }
+            }			
+        }
+    }
+}

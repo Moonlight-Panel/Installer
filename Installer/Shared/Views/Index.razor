@@ -1,0 +1,156 @@
+﻿@page "/"
+
+@using Installer.App.Models.Abstractions
+@using Installer.App.Services
+
+@inject InstallationService InstallationService
+
+@if (InstallationService.IsInstalling)
+{
+}
+else
+{
+    if (SelectedSoftware == null)
+    {
+        <div class="card card-body text-center p-5">
+            <div class="fw-semibold fs-2">Welcome to the moonlight panel web installer</div>
+            <div class="fw-semibold fs-4">Select a software to install on this machine</div>
+        </div>
+
+        <div class="row g-3 mt-5">
+            @foreach (var software in InstallationService.Softwares)
+            {
+                <div class="col-md-4 col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">
+                                <button class="btn btn-icon btn-secondary disabled me-3" disabled="disabled">
+                                    <i class="@(software.Icon)"></i>
+                                </button>
+                                @software.Name
+                            </span>
+                        </div>
+                        <div class="card-body fs-5">
+                            @(software.Description)
+                        </div>
+                        <div class="card-footer d-flex justify-content-center">
+                            <WButton OnClick="() => SelectSoftware(software)" CssClasses="btn btn-primary">
+                                Continue
+                                <i class="bx bx-sm bx-right-arrow-alt"></i>
+                            </WButton>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        if (IsSoftwareConfigured)
+        {
+            if (ConfigureDependencyIndex >= SoftwareDependencies.Length)
+            {
+                <div class="card card-body text-center p-5">
+                    <div class="fw-semibold fs-2">Configuration complete</div>
+                    <div class="fw-semibold fs-4">You have configured everything. You are now able to perform the installation</div>
+                </div>
+
+                <div class="card mt-5">
+                    <div class="card-body fs-5">
+                        <div class="alert alert-warning">
+                            Please keep in mind that the installation will modify the machine its running on.
+                            We do not take any responsibilities if this leads to permanent or temporary damage.
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <WButton OnClick="BeginInstall" CssClasses="btn btn-primary">
+                            Continue
+                            <i class="bx bx-sm bx-right-arrow-alt"></i>
+                        </WButton>
+                    </div>
+                </div>
+            }
+            else
+            {
+                var dependency = SoftwareDependencies[ConfigureDependencyIndex];
+                
+                <div class="card card-body text-center p-5">
+                    <div class="fw-semibold fs-2">Configuring dependency: <span class="text-primary">@(dependency.Name)</span></div>
+                    <div class="fw-semibold fs-4">@(SoftwareDependencies.Length - ConfigureDependencyIndex - 1) left</div>
+                </div>
+                
+                <div class="card mt-5">
+                    <SmartForm Model="dependency.Config" OnValidSubmit="NextDependencyConfiguration">
+                        <div class="card-body row">
+                            <DynamicTypedAutoForm Model="dependency.Config" Columns="6"></DynamicTypedAutoForm>
+                        </div>
+                        <div class="card-footer text-center">
+                            <button type="submit" class="btn btn-primary">
+                                Continue
+                                <i class="bx bx-sm bx-right-arrow-alt"></i>
+                            </button>
+                        </div>
+                    </SmartForm>
+
+                </div>
+            }
+        }
+        else
+        {
+            <div class="card card-body text-center p-5">
+                <div class="fw-semibold fs-2">Configuring: <span class="text-primary">@(SelectedSoftware.Name)</span></div>
+                <div class="fw-semibold fs-4">Edit the options below to fit your needs</div>
+            </div>
+
+            <div class="card mt-5">
+                <SmartForm Model="SelectedSoftware.Config" OnValidSubmit="FinishSoftwareConfigure">
+                    <div class="card-body row">
+                        <DynamicTypedAutoForm Model="SelectedSoftware.Config" Columns="6"></DynamicTypedAutoForm>
+                    </div>
+                    <div class="card-footer text-center">
+                        <button type="submit" class="btn btn-primary">
+                            Continue
+                            <i class="bx bx-sm bx-right-arrow-alt"></i>
+                        </button>
+                    </div>
+                </SmartForm>
+
+            </div>
+        }
+    }
+}
+
+@code
+{
+    private Software? SelectedSoftware = null;
+    private bool IsSoftwareConfigured = false;
+
+    private SoftwareDependency[] SoftwareDependencies;
+    private int ConfigureDependencyIndex = 0;
+
+    private async Task SelectSoftware(Software software)
+    {
+        SelectedSoftware = software;
+        SoftwareDependencies = await InstallationService.ResolveDependencies(SelectedSoftware);
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task FinishSoftwareConfigure()
+    {
+        IsSoftwareConfigured = true;
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task NextDependencyConfiguration()
+    {
+        ConfigureDependencyIndex++;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task BeginInstall()
+    {
+        
+    }
+}

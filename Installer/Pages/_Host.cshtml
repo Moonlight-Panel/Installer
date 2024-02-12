@@ -1,0 +1,34 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@namespace Installer.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8"/>
+    <base href="~/"/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Moonlight</title>
+
+    <link href="/css/theme.css" rel="stylesheet" type="text/css"/>
+    <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" rel="stylesheet" type="text/css">
+    <link href="/css/boxicons.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/css/sweetalert2dark.css" rel="stylesheet" type="text/css"/>
+
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered"/>
+</head>
+<body style="background-image: url('https://preview.keenthemes.com/metronic8/demo10/assets/media/misc/page-bg.jpg'); background-repeat: no-repeat; background-position: center; background-size: cover; background-attachment: fixed">
+
+<component type="typeof(BlazorApp)" render-mode="ServerPrerendered"/>
+
+<script src="/_framework/blazor.server.js"></script>
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/toaster.js"></script>
+<script src="/js/moonlight.js"></script>
+<script src="/_content/BlazorTable/BlazorTable.min.js"></script>
+<script src="/js/sweetalert2.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+//
+// launcher
+//
+
+// launcher
+.launcher {
+    padding: get($sidebar-config, spacing, desktop);
+
+    // Sidebar
+    .sidebar {
+        position: fixed;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        width: get($sidebar-config, width);
+        top: get($sidebar-config, spacing, desktop);
+        right: get($sidebar-config, spacing, desktop);
+        bottom: get($sidebar-config, spacing, desktop);
+        background-color: get($sidebar-config, bg-color);
+        @include border-radius(get($sidebar-config, border-radius));
+
+        .timeline {
+            .timeline-line {
+                opacity: 0.2;
+            }
+
+            .timeline-icon {
+                .symbol-label {
+                    background-color: #244cab;
+                }
+            }	
+        }
+
+        .border {
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .hover-scroll-y {
+            @include scrollbar-color(rgba($white, 0.15), rgba($white, 0.25));
+        }
+    }
+
+    // Sidebar enabled
+    &.sidebar-enabled {
+        padding-right: get($sidebar-config, width) + get($sidebar-config, spacing, desktop);
+    }
+}
+
+
+// Tablet & mobile modes
+@include media-breakpoint-down(lg) {
+    // launcher
+    .launcher {
+        padding: get($sidebar-config, spacing, tablet-and-mobile);
+
+        // Sidebar enabled
+        &.sidebar-enabled {
+            padding: get($sidebar-config, spacing, tablet-and-mobile);
+        }
+
+        // Sidebar
+        .sidebar {
+            display: none;
+            background-color: get($sidebar-config, bg-color-tablet-and-mobile);
+            top: get($sidebar-config, spacing, tablet-and-mobile);
+            right: get($sidebar-config, spacing, tablet-and-mobile);
+            bottom: get($sidebar-config, spacing, tablet-and-mobile);
+        } 
+    }
+}

@@ -1,0 +1,63 @@
+//
+// Layout Config
+//
+
+// Root font Sizes
+$root-font-size:                                    13px; // Root font size for desktop mode
+$root-font-size-lg:                             	13px; // Root font size for tablet mode
+$root-font-size-md:                             	12px; // Root font size for mobile mode
+
+// Page bg
+$page-bg: 											$body-bg !default;
+$page-bg-dark: 										$coal-400 !default;
+
+// App blank bg color
+$app-blank-bg-color: 								$white;
+$app-blank-bg-color-dark: 							$coal-400;
+
+
+// Content border radius
+$content-border-radius:								1.5rem !default;
+
+// Content Spacing
+$content-spacing: (
+	desktop: 30px, 
+	tablet-and-mobile: 15px 
+) !default;
+
+// Header
+$header-config: (
+	height: (
+		desktop: 75px,
+		tablet-and-mobile: 60px
+	),
+	bg-color: #130061,
+	bg-color-dark: #1E1E2D,
+	border-bottom: 0,
+	border-bottom-dark: 1px solid #2D2D43,
+	z-index: 100
+) !default;
+
+// Aside
+$aside-config: (
+	z-index: 100, 
+	menu-indention: 0.75rem,
+	bg-color: #F5F6FA,
+	bg-color-dark: $coal-600,
+	width: 300px, 
+	border-radius: 1.75rem
+) !default;
+
+// Sidebar
+$sidebar-config: (
+	z-index: 100, 
+	bg-color: rgba(19,0,97, 0.3),
+	bg-color-tablet-and-mobile: rgba(19,0,97, 0.75),
+	width: 425px, 
+	border-radius: 1.75rem,
+	spacing: (
+		desktop: 50px, 
+		tablet-and-mobile: 15px
+	)
+) !default;
+

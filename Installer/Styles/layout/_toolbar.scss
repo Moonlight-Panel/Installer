@@ -1,0 +1,17 @@
+//
+// Toolbar
+//
+
+// General
+.toolbar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+// Tablet & mobile modes
+@include media-breakpoint-down(lg) {
+	.toolbar {
+        flex-direction: column;
+    }
+}
