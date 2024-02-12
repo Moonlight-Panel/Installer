@@ -1,43 +1,37 @@
-using Installer.App.Extensions;
-using Installer.App.Helpers.LogMigrator;
-using Installer.App.Services.Interop;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Serilog;
+using Installer.App.Actions.Dependencies;
+using Installer.App.Actions.Panel;
+using Installer.App.Services;
+using MoonCore.Extensions;
+using MoonCore.Helpers;
+using MoonCoreUI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Setup logger
-var logConfig = new LoggerConfiguration();
-
-logConfig = logConfig.Enrich.FromLogContext()
-    .WriteTo.Console(
-        outputTemplate:
-        "{Timestamp:HH:mm:ss} [{Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}");
-
-if (args.Contains("--debug") || builder.Environment.IsDevelopment())
-    logConfig = logConfig.MinimumLevel.Debug();
-else
-    logConfig = logConfig.MinimumLevel.Information();
-
-Log.Logger = logConfig.CreateLogger();
+Logger.Setup(isDebug: args.Contains("--debug"));
+builder.Logging.MigrateToMoonCore();
 
 // Add services
+builder.Services.ConstructMoonCoreDi<Program>();
 
-builder.Services.AddScoped<AlertService>();
-builder.Services.AddScoped<ClipboardService>();
 builder.Services.AddScoped<CookieService>();
 builder.Services.AddScoped<FileDownloadService>();
-builder.Services.AddScoped<ModalService>();
+builder.Services.AddScoped<AlertService>();
 builder.Services.AddScoped<ToastService>();
+builder.Services.AddScoped<ClipboardService>();
+builder.Services.AddScoped<ModalService>();
+
+// Configure interop
+ToastService.Prefix = "mwi.toasts";
+ModalService.Prefix = "mwi.modals";
+AlertService.Prefix = "mwi.alerts";
+ClipboardService.Prefix = "mwi.clipboard";
+FileDownloadService.Prefix = "mwi.utils";
 
 //
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-
-builder.Logging.ClearProviders();
-builder.Logging.AddProvider(new LogMigrateProvider());
 
 var config =
     new ConfigurationBuilder().AddJsonString(
@@ -46,19 +40,17 @@ builder.Logging.AddConfiguration(config.Build());
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
-{
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
-
-app.UseStaticFiles();
-
 app.UseRouting();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+
+var installerService = app.Services.GetRequiredService<InstallerService>();
+
+// Software
+await installerService.RegisterSoftware<MoonlightLegacySoftware>();
+
+// Software dependencies
+await installerService.RegisterSoftwareDependency<DockerDependency>();
 
 app.Run();

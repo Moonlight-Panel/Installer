@@ -1,3 +1,47 @@
 ﻿@page "/"
 
-<div class="fs-3 fw-semibold text-center">Welcome to the moonlight web installer</div>
+@using Installer.App.Services
+
+@implements IDisposable
+
+@inject InstallerService InstallerService
+
+@if (InstallerService.IsInstalling)
+{
+    <div class="card">
+
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="card card-body">
+            <div class="fs-3 fw-semibold text-center">Welcome to the moonlight web installer</div>
+            <div class="fs-5 text-center">Select a software to install on this machine</div>
+        </div>
+    </div>
+    <div class="row g-3">
+        @foreach (var software in InstallerService.GetAvailableSoftware())
+        {
+            <div class="col-md-3 col-12">
+                <a href="#" class="card border-primary border-2 h-100">
+                    <div class="card-body">
+                        <div class="card-title">
+                            @(software.Name)
+                        </div>
+                        <div class="card-text">
+                            @(software.Description)
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+}
+
+@code
+{
+    public void Dispose()
+    {
+    }
+}
